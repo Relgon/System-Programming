@@ -62,7 +62,19 @@ namespace Lab2
 
         private delegate void AskBeforeDeleting();
 
-        private void DeleteButton_Click(object sender, EventArgs e)
+        private void WithAsking()
+        {
+            var dialog = new DialogForm(parent, "Удалить?");
+            dialog.Show();
+            parent.BringToFront();
+            dialog.OKButtonClick += DeleteSelectionText;
+        }
+        private void WithoutAsking()
+        {
+            parent.BringToFront();
+            DeleteSelectionText();
+        }
+        private bool Delete(AskBeforeDeleting method)
         {
             int curentPosition = FromStartRadio.Checked ? 0 : parent.TextEdit.SelectionStart;
             var data = TextEditIterator(parent.TextEdit, curentPosition);
@@ -81,16 +93,16 @@ namespace Lab2
                 }
                 flag = true;
                 parent.TextEdit.Select(item.Key, item.Value.Length);
-
-                var dialog = new DialogForm(parent, "Удалить?");
-                dialog.Show();
-                parent.BringToFront();
-                dialog.OKButtonClick += DeleteSelectionText;
+                method();
                 this.FromCursorRadio.Checked = true;
                 break;
-
             }
-            if (!flag)
+            return flag;
+        }
+        private void DeleteButton_Click(object sender, EventArgs e)
+        {
+            var isDeleted=Delete(WithAsking);
+            if (!isDeleted)
             {
                 MessageBox.Show("Совпадений не найдено!");
             }
@@ -98,7 +110,21 @@ namespace Lab2
 
         private void DeleteAllButton_Click(object sender, EventArgs e)
         {
-
+            int count = 0;
+            DialogResult result = MessageBox.Show("Удалить все?", "Удаление",
+                   MessageBoxButtons.YesNo);
+            if (result == DialogResult.No)
+            {
+                return;
+            }
+            while (Delete(WithoutAsking))
+            {
+                count++;
+            }
+            if (count == 0)
+            {
+                MessageBox.Show("Совпадений не найдено!");
+            }
         }
         
     }
