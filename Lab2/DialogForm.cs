@@ -13,7 +13,9 @@ namespace Lab2
     public partial class DialogForm : Form
     {
         private Form parent;
+        /*Тип делегата для функции обратного вызова.*/
         public delegate void Callback();
+        /*Событие,которое мы будем тригерить при нажатии на кнопку.*/
         public event Callback OKButtonClick;
 
         public DialogForm(Form parent,string message)
@@ -21,23 +23,21 @@ namespace Lab2
             InitializeComponent();
             this.parent = parent;
             this.TextMessage.Text = message;
+            /*На передний фон*/
             parent.BringToFront();
 
         }
 
+        /*Если нажали ОК,то генерим соотв. ивент,и закрываем форму.*/
         private void OKButton_Click(object sender, EventArgs e)
         {
-           /* parent.BringToFront();
-            parent.TopMost = true;*/
             OKButtonClick();
             Close();
     
         }
-
+        /*Иначе просто закрываем форму*/
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            parent.BringToFront();
-            parent.TopMost = true;
             Close();
       
         }
